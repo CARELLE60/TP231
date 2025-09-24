@@ -1,0 +1,187 @@
+#include <stdio.h>
+
+#define MAX 10
+
+// Fonctions générales
+void sommeMatrices(int A[][MAX], int B[][MAX], int C[][MAX], int n, int m) {
+    for(int i=0; i<n; i++)
+        for(int j=0; j<m; j++)
+            C[i][j] = A[i][j] + B[i][j];
+}
+
+void produitMatrices(int A[][MAX], int B[][MAX], int C[][MAX], int n, int m, int p) {
+    for(int i=0; i<n; i++)
+        for(int j=0; j<p; j++) {
+            C[i][j] = 0;
+            for(int k=0; k<m; k++)
+                C[i][j] += A[i][k] * B[k][j];
+        }
+}
+
+int rechercheSequentielle(int T[], int n, int x) {
+    for(int i=0; i<n; i++)
+        if(T[i] == x) return i;
+    return -1;
+}
+
+int multiplication(int a, int b) {
+    int res = 0;
+    for(int i=0; i<b; i++) res += a;
+    return res;
+}
+
+int estTrie(int T[], int n) {
+    for(int i=0; i<n-1; i++)
+        if(T[i] > T[i+1]) return 0;
+    return 1;
+}
+
+float mediane(int T[], int n) {
+    // Tri simple
+    for(int i=0; i<n-1; i++)
+        for(int j=i+1; j<n; j++)
+            if(T[i] > T[j]) {
+                int temp = T[i];
+                T[i] = T[j];
+                T[j] = temp;
+            }
+    return (n%2 == 1) ? T[n/2] : (T[n/2-1] + T[n/2])/2.0;
+}
+
+void inverser(int T[], int n) {
+    for(int i=0; i<n/2; i++) {
+        int temp = T[i];
+        T[i] = T[n-1-i];
+        T[n-1-i] = temp;
+    }
+}
+
+void produitVectoriel(int U[], int V[], int W[]) {
+    W[0] = U[1]*V[2] - U[2]*V[1];
+    W[1] = U[2]*V[0] - U[0]*V[2];
+    W[2] = U[0]*V[1] - U[1]*V[0];
+}
+
+void produitVecteurMatrice(int V[], int M[][MAX], int R[], int n, int m) {
+    for(int j=0; j<m; j++) {
+        R[j] = 0;
+        for(int i=0; i<n; i++)
+            R[j] += V[i] * M[i][j];
+    }
+}
+
+// Affichage
+void afficherMatrice(int M[][MAX], int n, int m) {
+    for(int i=0; i<n; i++) {
+        for(int j=0; j<m; j++)
+            printf("%d ", M[i][j]);
+        printf("\n");
+    }
+}
+
+void afficherVecteur(int V[], int n) {
+    for(int i=0; i<n; i++)
+        printf("%d ", V[i]);
+    printf("\n");
+}
+
+int main() {
+    int choix, n, m, p;
+    int A[MAX][MAX], B[MAX][MAX], C[MAX][MAX];
+    int T[MAX], U[3], V[3], W[3], R[MAX];
+    
+    do {
+        printf("\n1. Somme matrices\n2. Produit matrices\n3. Recherche\n4. Multiplication\n5. Test trie\n6. Mediane\n7. Inverse\n8. Produit vectoriel\n9. Vecteur*matrice\n0. Quitter\nChoix: ");
+        scanf("%d", &choix);
+        
+        switch(choix) {
+            case 1:
+                printf("Dimensions (lignes colonnes): ");
+                scanf("%d %d", &n, &m);
+                printf("Matrice A:\n");
+                for(int i=0; i<n; i++) for(int j=0; j<m; j++) scanf("%d", &A[i][j]);
+                printf("Matrice B:\n");
+                for(int i=0; i<n; i++) for(int j=0; j<m; j++) scanf("%d", &B[i][j]);
+                sommeMatrices(A, B, C, n, m);
+                afficherMatrice(C, n, m);
+                break;
+                
+            case 2:
+                printf("Dimensions (n m p): ");
+                scanf("%d %d %d", &n, &m, &p);
+                printf("Matrice A (%dx%d):\n", n, m);
+                for(int i=0; i<n; i++) for(int j=0; j<m; j++) scanf("%d", &A[i][j]);
+                printf("Matrice B (%dx%d):\n", m, p);
+                for(int i=0; i<m; i++) for(int j=0; j<p; j++) scanf("%d", &B[i][j]);
+                produitMatrices(A, B, C, n, m, p);
+                afficherMatrice(C, n, p);
+                break;
+                
+            case 3:
+                printf("Taille tableau: ");
+                scanf("%d", &n);
+                printf("Elements: ");
+                for(int i=0; i<n; i++) scanf("%d", &T[i]);
+                printf("Valeur cherchee: ");
+                scanf("%d", &m);
+                int pos = rechercheSequentielle(T, n, m);
+                printf(pos >= 0 ? "Trouve en position %d\n" : "Non trouve\n", pos);
+                break;
+                
+            case 4:
+                printf("a et b: ");
+                scanf("%d %d", &n, &m);
+                printf("%d x %d = %d\n", n, m, multiplication(n, m));
+                break;
+                
+            case 5:
+                printf("Taille tableau: ");
+                scanf("%d", &n);
+                printf("Elements: ");
+                for(int i=0; i<n; i++) scanf("%d", &T[i]);
+                printf(estTrie(T, n) ? "Trie\n" : "Non trie\n");
+                break;
+                
+            case 6:
+                printf("Taille tableau: ");
+                scanf("%d", &n);
+                printf("Elements: ");
+                for(int i=0; i<n; i++) scanf("%d", &T[i]);
+                printf("Mediane: %.2f\n", mediane(T, n));
+                break;
+                
+            case 7:
+                printf("Taille tableau: ");
+                scanf("%d", &n);
+                printf("Elements: ");
+                for(int i=0; i<n; i++) scanf("%d", &T[i]);
+                inverser(T, n);
+                afficherVecteur(T, n);
+                break;
+                
+            case 8:
+                printf("Vecteur U (3 elements): ");
+                for(int i=0; i<3; i++) scanf("%d", &U[i]);
+                printf("Vecteur V (3 elements): ");
+                for(int i=0; i<3; i++) scanf("%d", &V[i]);
+                produitVectoriel(U, V, W);
+                afficherVecteur(W, 3);
+                break;
+                
+            case 9:
+                printf("Taille vecteur: ");
+                scanf("%d", &n);
+                printf("Colonnes matrice: ");
+                scanf("%d", &m);
+                printf("Vecteur: ");
+                for(int i=0; i<n; i++) scanf("%d", &U[i]);
+                printf("Matrice (%dx%d):\n", n, m);
+                for(int i=0; i<n; i++) for(int j=0; j<m; j++) scanf("%d", &A[i][j]);
+                produitVecteurMatrice(U, A, R, n, m);
+                afficherVecteur(R, m);
+                break;
+        }
+    } while(choix != 0);
+    
+    return 0;
+}
