@@ -1,0 +1,375 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure pour liste simple
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// 1. SUPPRIMER TOUTES LES OCCURRENCES
+struct Node* supprimerOccurrences(struct Node* head, int valeur) {
+    struct Node *courant = head, *precedent = NULL;
+    
+    while (courant != NULL) {
+        if (courant->data == valeur) {
+            // Trouvé la valeur à supprimer
+            if (precedent == NULL) {
+                // Supprimer en tête
+                head = courant->next;
+                free(courant);
+                courant = head;
+            } else {
+                // Supprimer au milieu
+                precedent->next = courant->next;
+                free(courant);
+                courant = precedent->next;
+            }
+        } else {
+            // Avancer
+            precedent = courant;
+            courant = courant->next;
+        }
+    }
+    return head;
+}
+
+// 2. INSERTION LISTE SIMPLE TRIÉE
+struct Node* insererSimpleTriee(struct Node* head, int valeur) {
+    struct Node* nouveau = (struct Node*)malloc(sizeof(struct Node));
+    nouveau->data = valeur;
+    
+    // Cas 1: liste vide ou insertion en tête
+    if (head == NULL || valeur <= head->data) {
+        nouveau->next = head;
+        return nouveau;
+    }
+    
+    // Cas 2: trouver où insérer
+    struct Node* courant = head;
+    while (courant->next != NULL && courant->next->data < valeur) {
+        courant = courant->next;
+    }
+    
+    // Insérer après courant
+    nouveau->next = courant->next;
+    courant->next = nouveau;
+    
+    return head;
+}
+
+// 3. INSERTION LISTE DOUBLE TRIÉE
+struct DNode {
+    int data;
+    struct DNode* prev;
+    struct DNode* next;
+};
+
+struct DNode* insererDoubleTriee(struct DNode* head, int valeur) {
+    struct DNode* nouveau = (struct DNode*)malloc(sizeof(struct DNode));
+    nouveau->data = valeur;
+    nouveau->prev = NULL;
+    nouveau->next = NULL;
+    
+    // Liste vide
+    if (head == NULL) return nouveau;
+    
+    // Insertion en tête
+    if (valeur <= head->data) {
+        nouveau->next = head;
+        head->prev = nouveau;
+        return nouveau;
+    }
+    
+    // Trouver position
+    struct DNode* courant = head;
+    while (courant->next != NULL && courant->next->data < valeur) {
+        courant = courant->next;
+    }
+    
+    // Insérer après courant
+    nouveau->next = courant->next;
+    nouveau->prev = courant;
+    
+    if (courant->next != NULL) {
+        courant->next->prev = nouveau;
+    }
+    
+    courant->next = nouveau;
+    
+    return head;
+}
+
+// 4. LISTE CIRCULAIRE SIMPLE
+struct CNode {
+    int data;
+    struct CNode* next;
+};
+
+// Insertion en tête
+struct CNode* insererTeteCirculaire(struct CNode* head, int valeur) {
+    struct CNode* nouveau = (struct CNode*)malloc(sizeof(struct CNode));
+    nouveau->data = valeur;
+    
+    if (head == NULL) {
+        nouveau->next = nouveau; // Se pointe lui-même
+        return nouveau;
+    }
+    
+    // Trouver le dernier
+    struct CNode* dernier = head;
+    while (dernier->next != head) {
+        dernier = dernier->next;
+    }
+    
+    // Insérer en tête
+    nouveau->next = head;
+    dernier->next = nouveau;
+    
+    return nouveau;
+}
+
+// Insertion en queue
+struct CNode* insererQueueCirculaire(struct CNode* head, int valeur) {
+    struct CNode* nouveau = (struct CNode*)malloc(sizeof(struct CNode));
+    nouveau->data = valeur;
+    
+    if (head == NULL) {
+        nouveau->next = nouveau;
+        return nouveau;
+    }
+    
+    // Trouver le dernier
+    struct CNode* dernier = head;
+    while (dernier->next != head) {
+        dernier = dernier->next;
+    }
+    
+    // Insérer en queue
+    dernier->next = nouveau;
+    nouveau->next = head;
+    
+    return head;
+}
+
+// 5. LISTE DOUBLE CIRCULAIRE
+struct DCNode {
+    int data;
+    struct DCNode* prev;
+    struct DCNode* next;
+};
+
+// Insertion en tête
+struct DCNode* insererTeteDoubleCirculaire(struct DCNode* head, int valeur) {
+    struct DCNode* nouveau = (struct DCNode*)malloc(sizeof(struct DCNode));
+    nouveau->data = valeur;
+    
+    if (head == NULL) {
+        nouveau->next = nouveau;
+        nouveau->prev = nouveau;
+        return nouveau;
+    }
+    
+    struct DCNode* dernier = head->prev;
+    
+    nouveau->next = head;
+    nouveau->prev = dernier;
+    head->prev = nouveau;
+    dernier->next = nouveau;
+    
+    return nouveau;
+}
+
+// Insertion en queue
+struct DCNode* insererQueueDoubleCirculaire(struct DCNode* head, int valeur) {
+    struct DCNode* nouveau = (struct DCNode*)malloc(sizeof(struct DCNode));
+    nouveau->data = valeur;
+    
+    if (head == NULL) {
+        nouveau->next = nouveau;
+        nouveau->prev = nouveau;
+        return nouveau;
+    }
+    
+    struct DCNode* dernier = head->prev;
+    
+    nouveau->next = head;
+    nouveau->prev = dernier;
+    dernier->next = nouveau;
+    head->prev = nouveau;
+    
+    return head;
+}
+
+// FONCTIONS POUR AFFICHER
+void afficherSimple(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void afficherDouble(struct DNode* head) {
+    struct DNode* temp = head;
+    while (temp != NULL) {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void afficherCirculaire(struct CNode* head) {
+    if (head == NULL) {
+        printf("Liste vide\n");
+        return;
+    }
+    struct CNode* temp = head;
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(retour à %d)\n", head->data);
+}
+
+void afficherDoubleCirculaire(struct DCNode* head) {
+    if (head == NULL) {
+        printf("Liste vide\n");
+        return;
+    }
+    struct DCNode* temp = head;
+    do {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(retour à %d)\n", head->data);
+}
+
+// MENU PRINCIPAL
+int main() {
+    int choix, valeur;
+    
+    printf("=== PROGRAMME LISTES CHAINÉES ===\n\n");
+    
+    do {
+        printf("Choisissez une option:\n");
+        printf("1. Supprimer toutes les occurrences\n");
+        printf("2. Insertion liste simple triée\n");
+        printf("3. Insertion liste double triée\n");
+        printf("4. Insertion liste circulaire simple\n");
+        printf("5. Insertion liste circulaire double\n");
+        printf("6. Quitter\n");
+        printf("Votre choix: ");
+        scanf("%d", &choix);
+        
+        switch(choix) {
+            case 1: {
+                printf("\n--- SUPPRESSION OCCURRENCES ---\n");
+                struct Node* liste = NULL;
+                
+                // Créer une liste: 5 -> 2 -> 5 -> 3
+                struct Node* n1 = (struct Node*)malloc(sizeof(struct Node));
+                struct Node* n2 = (struct Node*)malloc(sizeof(struct Node));
+                struct Node* n3 = (struct Node*)malloc(sizeof(struct Node));
+                struct Node* n4 = (struct Node*)malloc(sizeof(struct Node));
+                
+                n1->data = 5; n1->next = n2;
+                n2->data = 2; n2->next = n3;
+                n3->data = 5; n3->next = n4;
+                n4->data = 3; n4->next = NULL;
+                liste = n1;
+                
+                printf("Liste initiale: ");
+                afficherSimple(liste);
+                
+                printf("Entrez la valeur à supprimer: ");
+                scanf("%d", &valeur);
+                
+                liste = supprimerOccurrences(liste, valeur);
+                printf("Liste après suppression: ");
+                afficherSimple(liste);
+                break;
+            }
+            
+            case 2: {
+                printf("\n--- LISTE SIMPLE TRIÉE ---\n");
+                struct Node* liste = NULL;
+                
+                printf("Entrez 3 nombres (ils seront triés automatiquement):\n");
+                for(int i = 0; i < 3; i++) {
+                    printf("Nombre %d: ", i+1);
+                    scanf("%d", &valeur);
+                    liste = insererSimpleTriee(liste, valeur);
+                }
+                
+                printf("Liste triée: ");
+                afficherSimple(liste);
+                break;
+            }
+            
+            case 3: {
+                printf("\n--- LISTE DOUBLE TRIÉE ---\n");
+                struct DNode* liste = NULL;
+                
+                printf("Entrez 3 nombres (ils seront triés automatiquement):\n");
+                for(int i = 0; i < 3; i++) {
+                    printf("Nombre %d: ", i+1);
+                    scanf("%d", &valeur);
+                    liste = insererDoubleTriee(liste, valeur);
+                }
+                
+                printf("Liste double triée: ");
+                afficherDouble(liste);
+                break;
+            }
+            
+            case 4: {
+                printf("\n--- LISTE CIRCULAIRE SIMPLE ---\n");
+                struct CNode* liste = NULL;
+                
+                printf("Insertion en tête de 10, 20, 30:\n");
+                liste = insererTeteCirculaire(liste, 10);
+                liste = insererTeteCirculaire(liste, 20);
+                liste = insererTeteCirculaire(liste, 30);
+                printf("Liste: ");
+                afficherCirculaire(liste);
+                
+                printf("Insertion en queue de 40:\n");
+                liste = insererQueueCirculaire(liste, 40);
+                printf("Liste: ");
+                afficherCirculaire(liste);
+                break;
+            }
+            
+            case 5: {
+                printf("\n--- LISTE DOUBLE CIRCULAIRE ---\n");
+                struct DCNode* liste = NULL;
+                
+                printf("Insertion en tête de 10, 20, 30:\n");
+                liste = insererTeteDoubleCirculaire(liste, 10);
+                liste = insererTeteDoubleCirculaire(liste, 20);
+                liste = insererTeteDoubleCirculaire(liste, 30);
+                printf("Liste: ");
+                afficherDoubleCirculaire(liste);
+                
+                printf("Insertion en queue de 40:\n");
+                liste = insererQueueDoubleCirculaire(liste, 40);
+                printf("Liste: ");
+                afficherDoubleCirculaire(liste);
+                break;
+            }
+            
+            case 6:
+                printf("Au revoir!\n");
+                break;
+                
+            default:
+                printf("Choix invalide!\n");
+        }
+        printf("\n");
+        
+    } while(choix != 6);
+    
+    return 0;
+}
